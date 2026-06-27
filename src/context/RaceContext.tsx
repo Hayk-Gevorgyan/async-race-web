@@ -4,18 +4,25 @@ import React, {
   useCallback,
   useContext,
   useEffect,
+  useMemo,
   useRef,
-  useState
-}                                                              from "react";
-import { Car }                                                 from "../types/Car";
-import { CarPayload }                                          from "../types/CarPayload";
-import { CarRaceState }                                        from "../components/Track";
-import { getCars, createCar, updateCar, deleteCar, PAGE_SIZE } from "../api/garage";
-import { startEngine, driveEngine, stopEngine }                from "../api/engine";
-import { getWinner, createWinner, updateWinner, deleteWinner } from "../api/winners";
-import { BRANDS, MODELS, randomFrom, randomHex }               from "../components/GarageHeader";
+  useState,
+} from 'react';
+import { Car } from '../types/Car';
+import { CarPayload } from '../types/CarPayload';
+import { CarRaceState } from '../components/Track';
+import {
+  getCars, createCar, updateCar, deleteCar, PAGE_SIZE,
+} from '../api/garage';
+import { startEngine, driveEngine, stopEngine } from '../api/engine';
+import {
+  getWinner, createWinner, updateWinner, deleteWinner,
+} from '../api/winners';
+import {
+  BRANDS, MODELS, randomFrom, randomHex,
+} from '../components/GarageHeader';
 
-export const DEFAULT_RACE_STATE: CarRaceState = { status: "idle", progress: 0, transitionDuration: 0 };
+export const DEFAULT_RACE_STATE: CarRaceState = { status: 'idle', progress: 0, transitionDuration: 0 };
 
 interface RaceTiming {
   accumulatedMs: number;
@@ -51,7 +58,7 @@ const RaceContext = createContext<RaceContextValue | null>(null);
 export function useRace(): RaceContextValue {
   const ctx = useContext(RaceContext);
   if (!ctx) {
-    throw new Error("useRace must be used inside RaceProvider");
+    throw new Error('useRace must be used inside RaceProvider');
   }
   return ctx;
 }
@@ -70,17 +77,19 @@ export const RaceProvider: FC<{ children: React.ReactNode }> = ({ children }) =>
   const activeCarIds = useRef<Set<number>>(new Set());
   // Absolute wall-clock finish time, not HTTP response order — avoids network jitter crowning the wrong car.
   const bestVisualFinishAt = useRef(Infinity);
+  // Tracks the definitive race winner; written on every visual-time improvement, read once at race end for persistence.
+  const bestWinner = useRef<{ car: Car; totalMs: number } | null>(null);
   // Guards against stale startCar callbacks firing winner logic after a reset or page change.
   const raceId = useRef(0);
 
   const totalPages = Math.max(1, Math.ceil(totalCount / PAGE_SIZE));
 
   const isRacing = Object.values(raceStates).some(
-    s => s.status === "starting" || s.status === "racing"
+    (s) => s.status === 'starting' || s.status === 'racing',
   );
 
   const canReset = Object.values(raceStates).some(
-    s => s.progress > 0 || s.status !== "idle"
+    (s) => s.progress > 0 || s.status !== 'idle',
   );
 
   const fetchPage = useCallback(async (page: number) => {
@@ -97,11 +106,12 @@ export const RaceProvider: FC<{ children: React.ReactNode }> = ({ children }) =>
   useEffect(() => {
     fetchPage(currentPage);
     return () => {
-      Object.values(driveControllers.current).forEach(c => c.abort());
+      Object.values(driveControllers.current).forEach((c) => c.abort());
       driveControllers.current = {};
       activeCarIds.current.clear();
-      raceId.current++;
+      raceId.current += 1;
       bestVisualFinishAt.current = Infinity;
+      bestWinner.current = null;
       setRaceStates({});
       setWinner(null);
     };
@@ -131,21 +141,20 @@ export const RaceProvider: FC<{ children: React.ReactNode }> = ({ children }) =>
   async function handleGenerate() {
     const payloads: CarPayload[] = Array.from({ length: 100 }, () => ({
       name: `${randomFrom(BRANDS)} ${randomFrom(MODELS)}`,
-      color: randomHex()
+      color: randomHex(),
     }));
-    await Promise.all(payloads.map(p => createCar(p)));
+    await Promise.all(payloads.map((p) => createCar(p)));
     fetchPage(currentPage);
   }
 
   async function persistWinner(car: Car, timeSeconds: number) {
-    setWinner({ name: car.name, time: timeSeconds });
     const existing = await getWinner(car.id);
     if (!existing) {
       await createWinner({ id: car.id, wins: 1, time: timeSeconds });
     } else {
       await updateWinner(car.id, {
         wins: existing.wins + 1,
-        time: Math.min(existing.time, timeSeconds)
+        time: Math.min(existing.time, timeSeconds),
       });
     }
   }
@@ -158,25 +167,25 @@ export const RaceProvider: FC<{ children: React.ReactNode }> = ({ children }) =>
 
     const myRaceId = raceId.current;
 
-    setRaceStates(prev => ({
+    setRaceStates((prev) => ({
       ...prev,
-      [ car.id ]: { status: "starting", progress: 0, transitionDuration: 0 }
+      [car.id]: { status: 'starting', progress: 0, transitionDuration: 0 },
     }));
 
     const { velocity, distance } = await startEngine(car.id);
     const duration = Math.round(distance / velocity);
     const segmentStart = Date.now();
 
-    const prevAccumulated = raceTimings.current[ car.id ]?.accumulatedMs ?? 0;
-    raceTimings.current[ car.id ] = { accumulatedMs: prevAccumulated, segmentStartMs: segmentStart };
+    const prevAccumulated = raceTimings.current[car.id]?.accumulatedMs ?? 0;
+    raceTimings.current[car.id] = { accumulatedMs: prevAccumulated, segmentStartMs: segmentStart };
 
-    setRaceStates(prev => ({
+    setRaceStates((prev) => ({
       ...prev,
-      [ car.id ]: { status: "racing", progress: 0, transitionDuration: duration }
+      [car.id]: { status: 'racing', progress: 0, transitionDuration: duration },
     }));
 
     const controller = new AbortController();
-    driveControllers.current[ car.id ] = controller;
+    driveControllers.current[car.id] = controller;
 
     try {
       await driveEngine(car.id, controller.signal);
@@ -184,20 +193,20 @@ export const RaceProvider: FC<{ children: React.ReactNode }> = ({ children }) =>
       // Visual finish time, not driveEngine response order — HTTP arrival ≠ animation completion.
       const visualFinishAt = segmentStart + duration;
       const totalMs = prevAccumulated + duration;
-      raceTimings.current[ car.id ] = { accumulatedMs: totalMs, segmentStartMs: 0 };
+      raceTimings.current[car.id] = { accumulatedMs: totalMs, segmentStartMs: 0 };
 
-      setRaceStates(prev => ({
+      setRaceStates((prev) => ({
         ...prev,
-        [ car.id ]: { status: "finished", progress: 1, transitionDuration: 0 }
+        [car.id]: { status: 'finished', progress: 1, transitionDuration: 0 },
       }));
 
       if (myRaceId === raceId.current && visualFinishAt < bestVisualFinishAt.current) {
         bestVisualFinishAt.current = visualFinishAt;
-        persistWinner(car, totalMs / 1000);
-        setBannerResetKey(k => k + 1);
+        bestWinner.current = { car, totalMs };
+        setWinner({ name: car.name, time: totalMs / 1000 });
       }
     } catch (err) {
-      if ((err as Error).name === "AbortError") {
+      if ((err as Error).name === 'AbortError') {
         activeCarIds.current.delete(car.id);
         return;
       }
@@ -207,107 +216,103 @@ export const RaceProvider: FC<{ children: React.ReactNode }> = ({ children }) =>
       }
       const elapsed = Date.now() - segmentStart;
       const frozenProgress = Math.min(1, elapsed / duration);
-      raceTimings.current[ car.id ] = { accumulatedMs: prevAccumulated + elapsed, segmentStartMs: 0 };
+      raceTimings.current[car.id] = { accumulatedMs: prevAccumulated + elapsed, segmentStartMs: 0 };
 
-      setRaceStates(prev => ({
+      setRaceStates((prev) => ({
         ...prev,
-        [ car.id ]: { status: "broken", progress: frozenProgress, transitionDuration: 0 }
+        [car.id]: { status: 'broken', progress: frozenProgress, transitionDuration: 0 },
       }));
     }
 
     activeCarIds.current.delete(car.id);
     if (activeCarIds.current.size === 0 && myRaceId === raceId.current) {
-      setBannerResetKey(k => k + 1);
+      if (bestWinner.current) {
+        const { car: winCar, totalMs: winMs } = bestWinner.current;
+        persistWinner(winCar, winMs / 1000);
+      }
+      setBannerResetKey((k) => k + 1);
     }
   }
 
   async function stopCar(id: number) {
-    driveControllers.current[ id ]?.abort();
+    driveControllers.current[id]?.abort();
 
-    const timing = raceTimings.current[ id ];
+    const timing = raceTimings.current[id];
     const elapsed = timing?.segmentStartMs ? Date.now() - timing.segmentStartMs : 0;
-    raceTimings.current[ id ] = { accumulatedMs: (timing?.accumulatedMs ?? 0) + elapsed, segmentStartMs: 0 };
+    raceTimings.current[id] = { accumulatedMs: (timing?.accumulatedMs ?? 0) + elapsed, segmentStartMs: 0 };
 
-    setRaceStates(prev => {
-      const state = prev[ id ];
-      if (!state || (state.status !== "racing" && state.status !== "starting")) {
+    setRaceStates((prev) => {
+      const state = prev[id];
+      if (!state || (state.status !== 'racing' && state.status !== 'starting')) {
         return prev;
       }
       const frozenProgress = state.transitionDuration > 0
         ? Math.min(1, elapsed / state.transitionDuration)
         : state.progress;
-      return { ...prev, [ id ]: { status: "idle", progress: frozenProgress, transitionDuration: 0 } };
+      return { ...prev, [id]: { status: 'idle', progress: frozenProgress, transitionDuration: 0 } };
     });
 
     await stopEngine(id).catch(() => {
     });
 
-    raceTimings.current[ id ] = { accumulatedMs: 0, segmentStartMs: 0 };
-    setRaceStates(prev => ({
+    raceTimings.current[id] = { accumulatedMs: 0, segmentStartMs: 0 };
+    setRaceStates((prev) => ({
       ...prev,
-      [ id ]: { status: "idle", progress: 0, transitionDuration: 0 }
+      [id]: { status: 'idle', progress: 0, transitionDuration: 0 },
     }));
   }
 
   function startRace() {
-    raceId.current++;
+    raceId.current += 1;
     bestVisualFinishAt.current = Infinity;
-    cars.forEach(car => startCar(car));
+    bestWinner.current = null;
+    cars.forEach((car) => startCar(car));
   }
 
   async function resetRace() {
-    raceId.current++;
+    raceId.current += 1;
     bestVisualFinishAt.current = Infinity;
+    bestWinner.current = null;
 
-    cars.forEach(car => driveControllers.current[ car.id ]?.abort());
+    cars.forEach((car) => driveControllers.current[car.id]?.abort());
     activeCarIds.current.clear();
 
     const now = Date.now();
     const elapsedById: Record<number, number> = {};
-    for (const car of cars) {
-      const timing = raceTimings.current[ car.id ];
+    cars.forEach((car) => {
+      const timing = raceTimings.current[car.id];
       const elapsed = timing?.segmentStartMs ? now - timing.segmentStartMs : 0;
-      elapsedById[ car.id ] = elapsed;
-      raceTimings.current[ car.id ] = {
+      elapsedById[car.id] = elapsed;
+      raceTimings.current[car.id] = {
         accumulatedMs: (timing?.accumulatedMs ?? 0) + elapsed,
-        segmentStartMs: 0
+        segmentStartMs: 0,
       };
-    }
-
-    setRaceStates(prev => {
-      const next = { ...prev };
-      for (const car of cars) {
-        const state = prev[ car.id ];
-        if (!state) {
-          continue;
-        }
-        const elapsed = elapsedById[ car.id ] ?? 0;
-        const frozenProgress = state.transitionDuration > 0
-          ? Math.min(1, elapsed / state.transitionDuration)
-          : state.progress;
-        next[ car.id ] = { status: "idle", progress: frozenProgress, transitionDuration: 0 };
-      }
-      return next;
     });
 
-    await Promise.all(cars.map(car => stopEngine(car.id).catch(() => {
-    })));
+    setRaceStates((prev) => cars.reduce<Record<number, CarRaceState>>((next, car) => {
+      const state = prev[car.id];
+      if (!state) return next;
+      const elapsed = elapsedById[car.id] ?? 0;
+      const frozenProgress = state.transitionDuration > 0
+        ? Math.min(1, elapsed / state.transitionDuration)
+        : state.progress;
+      return { ...next, [car.id]: { status: 'idle', progress: frozenProgress, transitionDuration: 0 } };
+    }, { ...prev }));
 
-    for (const car of cars) {
-      raceTimings.current[ car.id ] = { accumulatedMs: 0, segmentStartMs: 0 };
-    }
-    setRaceStates(prev => {
-      const next = { ...prev };
-      for (const car of cars) {
-        next[ car.id ] = { status: "idle", progress: 0, transitionDuration: 0 };
-      }
-      return next;
+    await Promise.all(cars.map((car) => stopEngine(car.id).catch(() => {})));
+
+    cars.forEach((car) => {
+      raceTimings.current[car.id] = { accumulatedMs: 0, segmentStartMs: 0 };
     });
+    setRaceStates((prev) => cars.reduce<Record<number, CarRaceState>>(
+      (next, car) => ({ ...next, [car.id]: { status: 'idle', progress: 0, transitionDuration: 0 } }),
+      { ...prev },
+    ));
 
     setWinner(null);
   }
 
-  const value: RaceContextValue = {
+  const value: RaceContextValue = useMemo(() => ({
     cars,
     totalCount,
     totalPages,
@@ -328,8 +333,9 @@ export const RaceProvider: FC<{ children: React.ReactNode }> = ({ children }) =>
     startRace,
     resetRace,
     startCar,
-    stopCar
-  };
+    stopCar,
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }), [cars, totalCount, totalPages, currentPage, selectedCar, raceStates, winner, bannerResetKey, isRacing, canReset]);
 
   return <RaceContext.Provider value={value}>{children}</RaceContext.Provider>;
 };

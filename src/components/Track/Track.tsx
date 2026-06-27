@@ -1,14 +1,9 @@
-import React, { FC, useState, useEffect } from "react";
-import { CarProps }                        from "../Car";
-import { Car }                             from "../Car";
-import { Icon }                            from "../Icon";
+import React, { FC, useState, useEffect } from 'react';
+import { CarProps, Car } from '../Car';
+import { Icon } from '../Icon';
+import { COLOR } from '../../styles/tokens';
 
-const CAR_WIDTH    = 160;
-const CAR_HEIGHT   = 90;
-const TRACK_HEIGHT = CAR_HEIGHT + 24;
-const PANEL_WIDTH  = 220;
-
-export type RaceStatus = "idle" | "starting" | "racing" | "broken" | "finished";
+export type RaceStatus = 'idle' | 'starting' | 'racing' | 'broken' | 'finished';
 
 export interface CarRaceState {
   status: RaceStatus;
@@ -19,40 +14,40 @@ export interface CarRaceState {
 interface TrackProps {
   car: CarProps;
   raceState: CarRaceState;
-  onEdit:   (car: CarProps) => void;
+  onEdit: (car: CarProps) => void;
   onDelete: (id: number) => void;
-  onStart:  (car: CarProps) => void;
-  onStop:   (id: number) => void;
+  onStart: (car: CarProps) => void;
+  onStop: (id: number) => void;
 }
 
 const panelBtnStyle: React.CSSProperties = {
-  background: "#1e1e2e",
-  color: "#e0e0f0",
-  border: "1px solid #2a2a35",
-  borderRadius: 4,
-  padding: "3px 10px",
+  background: COLOR.BG_RAISED,
+  color: COLOR.TEXT_SECONDARY,
+  border: `1px solid ${COLOR.BORDER}`,
+  borderRadius: 'var(--radius-sm)',
+  padding: '3px 10px',
   fontSize: 12,
-  cursor: "pointer",
-  width: "100%",
-  display: "flex",
-  alignItems: "center",
-  justifyContent: "center",
+  cursor: 'pointer',
+  width: '100%',
+  display: 'flex',
+  alignItems: 'center',
+  justifyContent: 'center',
   gap: 5,
 };
 
-export const Track: FC<TrackProps> = React.memo(function Track({
+export const Track: FC<TrackProps> = React.memo(({
   car,
   raceState,
   onEdit,
   onDelete,
   onStart,
   onStop,
-}) {
-  const [displayProgress, setDisplayProgress]     = useState(0);
+}) => {
+  const [displayProgress, setDisplayProgress] = useState(0);
   const [displayTransition, setDisplayTransition] = useState(0);
 
   useEffect(() => {
-    if (raceState.status === "racing") {
+    if (raceState.status === 'racing') {
       setDisplayProgress(0);
       setDisplayTransition(0);
       const raf = requestAnimationFrame(() => {
@@ -62,69 +57,82 @@ export const Track: FC<TrackProps> = React.memo(function Track({
         });
       });
       return () => cancelAnimationFrame(raf);
-    } else {
-      setDisplayProgress(raceState.progress);
-      setDisplayTransition(0);
     }
+    setDisplayProgress(raceState.progress);
+    setDisplayTransition(0);
+    return undefined;
   }, [raceState.status, raceState.transitionDuration, raceState.progress]);
 
-  const isActive = raceState.status === "starting" || raceState.status === "racing";
-  const isBroken = raceState.status === "broken";
+  const isActive = raceState.status === 'starting' || raceState.status === 'racing';
+  const isBroken = raceState.status === 'broken';
 
   return (
-    <div style={{ display: "flex", width: "100%", height: TRACK_HEIGHT, borderBottom: "2px solid #2a2a35" }}>
+    <div style={{
+      display: 'flex', width: '100%', height: 'var(--track-height)', borderBottom: `2px solid ${COLOR.BORDER}`,
+    }}
+    >
       <div
         style={{
-          width: PANEL_WIDTH,
+          width: 'var(--panel-width)',
           flexShrink: 0,
-          display: "flex",
-          flexDirection: "column",
-          justifyContent: "center",
+          display: 'flex',
+          flexDirection: 'column',
+          justifyContent: 'center',
           gap: 4,
-          padding: "0 12px",
-          background: "#16161e",
-          borderRight: "2px solid #2a2a35",
+          padding: '0 12px',
+          background: COLOR.BG_BASE,
+          borderRight: `2px solid ${COLOR.BORDER}`,
         }}
       >
         {isActive ? (
-          <button style={{ ...panelBtnStyle, color: "#fbbf24" }} onClick={() => onStop(car.id)}>
-            <Icon name="cancel" size={11} color="#fbbf24" /> Stop
+          <button type="button" style={{ ...panelBtnStyle, color: COLOR.WARNING }} onClick={() => onStop(car.id)}>
+            <Icon name="cancel" size={11} color={COLOR.WARNING} />
+            {' '}
+            Stop
           </button>
         ) : (
-          <button style={panelBtnStyle} onClick={() => onStart(car)}>
-            <Icon name="flag" size={11} /> Start
+          <button type="button" style={panelBtnStyle} onClick={() => onStart(car)}>
+            <Icon name="flag" size={11} />
+            {' '}
+            Start
           </button>
         )}
         <button
-          style={{ ...panelBtnStyle, color: isActive ? "#555" : "#a78bfa", cursor: isActive ? "not-allowed" : "pointer" }}
+          type="button"
+          style={{ ...panelBtnStyle, color: isActive ? COLOR.TEXT_DISABLED : COLOR.INFO, cursor: isActive ? 'not-allowed' : 'pointer' }}
           onClick={() => onEdit(car)}
           disabled={isActive}
         >
-          <Icon name="pencil" size={11} color={isActive ? "#555" : "#a78bfa"} /> Edit
+          <Icon name="pencil" size={11} color={isActive ? COLOR.TEXT_DISABLED : COLOR.INFO} />
+          {' '}
+          Edit
         </button>
         <button
-          style={{ ...panelBtnStyle, color: isActive ? "#555" : "#f87171", cursor: isActive ? "not-allowed" : "pointer" }}
+          type="button"
+          style={{ ...panelBtnStyle, color: isActive ? COLOR.TEXT_DISABLED : COLOR.DANGER, cursor: isActive ? 'not-allowed' : 'pointer' }}
           onClick={() => onDelete(car.id)}
           disabled={isActive}
         >
-          <Icon name="trash" size={11} color={isActive ? "#555" : "#f87171"} /> Delete
+          <Icon name="trash" size={11} color={isActive ? COLOR.TEXT_DISABLED : COLOR.DANGER} />
+          {' '}
+          Delete
         </button>
       </div>
 
-      <div style={{ position: "relative", flex: 1, backgroundColor: "#16161e" }}>
+      <div style={{ position: 'relative', flex: 1, backgroundColor: COLOR.BG_BASE }}>
         <div
           style={{
-            position: "absolute",
-            left: 8,
-            top: "50%",
-            transform: "translateY(-50%)",
+            position: 'absolute',
+            left: 'var(--car-width)',
+            top: '50%',
+            transform: 'translateY(-50%)',
             zIndex: 0,
             fontSize: 18,
             fontWeight: 700,
-            color: "#e8e8e8",
-            whiteSpace: "nowrap",
-            pointerEvents: "none",
-            userSelect: "none",
+            color: car.color,
+            whiteSpace: 'nowrap',
+            pointerEvents: 'none',
+            userSelect: 'none',
           }}
         >
           {car.name}
@@ -132,13 +140,13 @@ export const Track: FC<TrackProps> = React.memo(function Track({
 
         <div
           style={{
-            position: "absolute",
-            top: "50%",
-            transform: "translateY(-50%)",
-            left: `calc(${displayProgress} * (100% - ${CAR_WIDTH}px))`,
-            transition: displayTransition > 0 ? `left ${displayTransition}ms linear` : "none",
-            width: CAR_WIDTH,
-            height: CAR_HEIGHT,
+            position: 'absolute',
+            top: '50%',
+            transform: 'translateY(-50%)',
+            left: `calc(${displayProgress} * (100% - var(--car-width)))`,
+            transition: displayTransition > 0 ? `left ${displayTransition}ms linear` : 'none',
+            width: 'var(--car-width)',
+            height: 'var(--car-height)',
             zIndex: 1,
             opacity: isBroken ? 0.4 : 1,
           }}
@@ -150,20 +158,20 @@ export const Track: FC<TrackProps> = React.memo(function Track({
         {isBroken && (
           <div
             style={{
-              position: "absolute",
-              top: "50%",
-              transform: "translateY(-50%)",
-              left: `calc(${displayProgress} * (100% - ${CAR_WIDTH}px))`,
-              width: CAR_WIDTH,
-              height: CAR_HEIGHT,
+              position: 'absolute',
+              top: '50%',
+              transform: 'translateY(-50%)',
+              left: `calc(${displayProgress} * (100% - var(--car-width)))`,
+              width: 'var(--car-width)',
+              height: 'var(--car-height)',
               zIndex: 2,
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "center",
-              pointerEvents: "none",
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              pointerEvents: 'none',
             }}
           >
-            <Icon name="wrench" size={36} color="#f87171" />
+            <Icon name="wrench" size={36} color={COLOR.DANGER} />
           </div>
         )}
       </div>

@@ -1,4 +1,4 @@
-import { EngineStatus } from "./EngineStatus";
+import { EngineStatus } from './EngineStatus';
 
 export interface EngineQuery {
   id: number;

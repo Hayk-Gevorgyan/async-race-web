@@ -1,5 +1,6 @@
-import React, { FC, useEffect, useRef } from "react";
-import { Icon } from "../Icon";
+import React, { FC, useEffect, useRef } from 'react';
+import { Icon } from '../Icon';
+import { COLOR } from '../../styles/tokens';
 
 const AUTO_DISMISS_MS = 5000;
 
@@ -9,12 +10,12 @@ interface WinnerBannerProps {
   resetKey: number;
 }
 
-export const WinnerBanner: FC<WinnerBannerProps> = React.memo(function WinnerBanner({ winner, onClose, resetKey }) {
+export const WinnerBanner: FC<WinnerBannerProps> = React.memo(({ winner, onClose, resetKey }) => {
   const onCloseRef = useRef(onClose);
   useEffect(() => { onCloseRef.current = onClose; }, [onClose]);
 
   useEffect(() => {
-    if (!winner) return;
+    if (!winner) return undefined;
     const timer = setTimeout(() => onCloseRef.current(), AUTO_DISMISS_MS);
     return () => clearTimeout(timer);
   }, [winner, resetKey]);
@@ -24,36 +25,44 @@ export const WinnerBanner: FC<WinnerBannerProps> = React.memo(function WinnerBan
   return (
     <div
       style={{
-        position: "fixed",
+        position: 'fixed',
         top: 24,
-        left: "50%",
-        transform: "translateX(-50%)",
-        background: "#6c63ff",
-        color: "#fff",
-        padding: "14px 28px",
-        borderRadius: 8,
+        left: '50%',
+        transform: 'translateX(-50%)',
+        background: COLOR.PRIMARY,
+        color: COLOR.WHITE,
+        padding: '14px 28px',
+        borderRadius: 'var(--radius-md)',
         fontSize: 16,
         fontWeight: 600,
-        display: "flex",
-        alignItems: "center",
+        display: 'flex',
+        alignItems: 'center',
         gap: 16,
         zIndex: 100,
-        boxShadow: "0 4px 24px rgba(0,0,0,0.4)",
+        boxShadow: '0 4px 24px rgba(0,0,0,0.4)',
       }}
     >
       <Icon name="trophy" size={20} />
-      <span>Winner: {winner.name} — {winner.time.toFixed(2)}s</span>
+      <span>
+        Winner:
+        {winner.name}
+        {' '}
+        —
+        {winner.time.toFixed(2)}
+        s
+      </span>
       <button
+        type="button"
         onClick={onClose}
         style={{
-          background: "rgba(255,255,255,0.2)",
-          border: "none",
-          color: "#fff",
+          background: 'rgba(255,255,255,0.2)',
+          border: 'none',
+          color: '#fff',
           borderRadius: 4,
-          padding: "4px 8px",
-          cursor: "pointer",
-          display: "flex",
-          alignItems: "center",
+          padding: '4px 8px',
+          cursor: 'pointer',
+          display: 'flex',
+          alignItems: 'center',
         }}
       >
         <Icon name="cancel" size={14} />

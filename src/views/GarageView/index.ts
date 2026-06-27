@@ -1,1 +1,1 @@
-export { GarageView } from "./GarageView.tsx";
+export { GarageView } from './GarageView.tsx';

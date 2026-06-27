@@ -1,3 +1,28 @@
+:root {
+  /* Layout */
+  --car-width:    70px;
+  --car-height:   90px;
+  --track-height: 114px; /* car-height + 24 */
+  --panel-width:  220px;
+  --radius-sm:    4px;
+  --radius-md:    8px;
+
+  /* Colors */
+  --bg-deep:        #0f0f13;
+  --bg-base:        #16161e;
+  --bg-raised:      #1e1e2e;
+  --border:         #2a2a35;
+  --text:           #e8e8e8;
+  --text-secondary: #e0e0f0;
+  --text-muted:     #888;
+  --text-disabled:  #555;
+  --text-hover:     #ccc;
+  --primary:        #6c63ff;
+  --danger:         #f87171;
+  --warning:        #fbbf24;
+  --info:           #a78bfa;
+}
+
 *, *::before, *::after {
   box-sizing: border-box;
 }
@@ -5,8 +30,8 @@
 body {
   margin: 0;
   font-family: system-ui, sans-serif;
-  background: #0f0f13;
-  color: #e8e8e8;
+  background: var(--bg-deep);
+  color: var(--text);
   min-height: 100vh;
 }
 
@@ -18,9 +43,9 @@ body {
 
 /* Nav */
 .nav {
-  border-bottom: 1px solid #2a2a35;
+  border-bottom: 1px solid var(--border);
   padding: 0 24px;
-  background: #16161e;
+  background: var(--bg-base);
 }
 
 .nav-tab {
@@ -28,7 +53,7 @@ body {
   background: none;
   border: none;
   border-bottom: 2px solid transparent;
-  color: #888;
+  color: var(--text-muted);
   font-size: 14px;
   font-weight: 500;
   letter-spacing: 0.04em;
@@ -39,12 +64,12 @@ body {
 }
 
 .nav-tab:hover {
-  color: #ccc;
+  color: var(--text-hover);
 }
 
 .nav-tab.active {
   color: #fff;
-  border-bottom-color: #6c63ff;
+  border-bottom-color: var(--primary);
 }
 
 /* Page content */

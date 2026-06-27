@@ -1,1 +1,1 @@
-export type WinnerSortField = "id" | "wins" | "time";
+export type WinnerSortField = 'id' | 'wins' | 'time';

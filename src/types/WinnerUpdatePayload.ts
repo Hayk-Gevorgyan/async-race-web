@@ -1,3 +1,3 @@
-import { Winner } from "./Winner";
+import { Winner } from './Winner';
 
-export type WinnerUpdatePayload = Pick<Winner, "wins" | "time">;
+export type WinnerUpdatePayload = Pick<Winner, 'wins' | 'time'>;

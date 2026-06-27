@@ -1,3 +1,3 @@
-import { Winner } from "./Winner";
+import { Winner } from './Winner';
 
 export type WinnerCreatePayload = Winner;

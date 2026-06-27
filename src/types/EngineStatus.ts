@@ -1,1 +1,1 @@
-export type EngineStatus = "started" | "stopped" | "drive";
+export type EngineStatus = 'started' | 'stopped' | 'drive';

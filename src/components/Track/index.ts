@@ -1,2 +1,2 @@
-export { Track } from "./Track";
-export type { CarRaceState, RaceStatus } from "./Track";
+export { Track } from './Track';
+export type { CarRaceState, RaceStatus } from './Track';

@@ -1,24 +1,23 @@
-import { Car as CarType } from "../../types/Car";
-import React from "react";
-import { FC } from "react";
-import { Icon } from "../Icon";
+import React, { FC } from 'react';
+import { COLOR } from '../../styles/tokens.ts';
+import { Car as CarType } from '../../types/Car';
+import { Icon } from '../Icon';
 
-export interface CarProps extends CarType {}
+export type CarProps = CarType;
 
-export const Car: FC<CarProps> = React.memo(function Car({ color }: CarType) {
-  return (
-    <div
-      style={{
-        width: 70,
-        height: 90,
-        display: "flex",
-        alignItems: "center",
-        justifyContent: "center",
-        userSelect: "none",
-        overflow: "hidden",
-      }}
-    >
-      <Icon name="car-top-view" size={90} color={color} />
-    </div>
-  );
-});
+export const Car: FC<CarProps> = React.memo(({ color }: CarType) => (
+  <div
+    style={{
+      width: 'var(--car-width)',
+      height: 'var(--car-height)',
+      background: COLOR.BG_BASE,
+      display: 'flex',
+      alignItems: 'center',
+      justifyContent: 'center',
+      userSelect: 'none',
+      overflow: 'hidden',
+    }}
+  >
+    <Icon name="car-top-view" style={{ fontSize: 'var(--car-height)' }} color={color} />
+  </div>
+));

@@ -1,1 +1,1 @@
-export { WinnersView } from "./WinnersView.tsx";
+export { WinnersView } from './WinnersView.tsx';

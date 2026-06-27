@@ -1,12 +1,13 @@
-import React, { FC } from "react";
-import Stack           from "../../components/Stack";
-import { Track }       from "../../components/Track";
-import { GarageHeader } from "../../components/GarageHeader";
-import { Pagination }  from "../../components/Pagination";
-import { WinnerBanner } from "../../components/WinnerBanner";
-import { useRace, DEFAULT_RACE_STATE } from "../../context/RaceContext";
+import React, { FC } from 'react';
+import Stack from '../../components/Stack';
+import { Track } from '../../components/Track';
+import { GarageHeader } from '../../components/GarageHeader';
+import { Pagination } from '../../components/Pagination';
+import { WinnerBanner } from '../../components/WinnerBanner';
+import { useRace, DEFAULT_RACE_STATE } from '../../context/RaceContext';
+import { COLOR } from '../../styles/tokens';
 
-export const GarageView: FC = React.memo(function GarageView() {
+export const GarageView: FC = React.memo(() => {
   const {
     cars,
     totalCount,
@@ -32,7 +33,7 @@ export const GarageView: FC = React.memo(function GarageView() {
   } = useRace();
 
   return (
-    <Stack direction={"column"} alignItems={"stretch"} spacing={0}>
+    <Stack direction="column" alignItems="stretch" spacing={0}>
       <WinnerBanner winner={winner} onClose={closeWinner} resetKey={bannerResetKey} />
 
       <GarageHeader
@@ -46,16 +47,24 @@ export const GarageView: FC = React.memo(function GarageView() {
         onResetRace={resetRace}
       />
 
-      <div style={{ padding: "8px 0", color: "#888", fontSize: 13, paddingLeft: 16 }}>
-        Garage ({totalCount})
+      <div style={{
+        padding: '8px 0', color: COLOR.TEXT_MUTED, fontSize: 13, paddingLeft: 16,
+      }}
+      >
+        Garage (
+        {totalCount}
+        )
       </div>
 
       {cars.length === 0 ? (
-        <div style={{ padding: 48, textAlign: "center", color: "#555", fontSize: 18 }}>
+        <div style={{
+          padding: 48, textAlign: 'center', color: COLOR.TEXT_DISABLED, fontSize: 18,
+        }}
+        >
           No Cars
         </div>
       ) : (
-        cars.map(car => (
+        cars.map((car) => (
           <Track
             key={car.id}
             car={car}

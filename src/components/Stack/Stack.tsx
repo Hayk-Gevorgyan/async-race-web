@@ -1,28 +1,28 @@
-import React from "react";
-import StackItem from "./StackItem";
+import React from 'react';
+import StackItem from './StackItem';
 
 export interface StackProps extends React.HTMLAttributes<HTMLElement> {
   as?: React.ElementType;
-  direction?: "row" | "row-reverse" | "column" | "column-reverse";
-  alignItems?: "flex-start" | "flex-end" | "center" | "stretch" | "baseline";
-  alignSelf?: React.CSSProperties["alignSelf"];
+  direction?: 'row' | 'row-reverse' | 'column' | 'column-reverse';
+  alignItems?: 'flex-start' | 'flex-end' | 'center' | 'stretch' | 'baseline';
+  alignSelf?: React.CSSProperties['alignSelf'];
   justifyContent?:
-    | "flex-start"
-    | "flex-end"
-    | "center"
-    | "space-between"
-    | "space-around"
-    | "space-evenly";
+    | 'flex-start'
+    | 'flex-end'
+    | 'center'
+    | 'space-between'
+    | 'space-around'
+    | 'space-evenly';
   /** Gap between children — passed directly to CSS `gap`. Accepts px number or any CSS string (e.g. "8px 16px") */
   spacing?: number | string;
-  wrap?: boolean | "wrap" | "wrap-reverse";
+  wrap?: boolean | 'wrap' | 'wrap-reverse';
   /** Element rendered between each child */
   divider?: React.ReactNode;
   /**
    * "wrap"  — non-StackItem children are automatically wrapped in a StackItem
    * "clone" — class/style are merged directly onto each child via cloneElement
    */
-  childrenRenderMode?: "wrap" | "clone";
+  childrenRenderMode?: 'wrap' | 'clone';
 }
 
 export interface StackComponent
@@ -33,27 +33,30 @@ export interface StackComponent
 const Stack = React.forwardRef<HTMLElement, StackProps>(
   (
     {
-      as: Component = "div",
-      direction = "row",
-      alignItems = "center",
+      as: Component = 'div',
+      direction = 'row',
+      alignItems = 'center',
       alignSelf,
       justifyContent,
       spacing,
       wrap,
       divider,
-      childrenRenderMode = "wrap",
+      childrenRenderMode = 'wrap',
       style,
       className,
       children,
       ...rest
     },
-    ref
+    ref,
   ) => {
-    const flexWrap = wrap === true ? "wrap" : wrap === false ? undefined : wrap;
-    const gap = typeof spacing === "number" ? `${spacing}px` : spacing;
+    let flexWrap: 'wrap' | 'wrap-reverse' | undefined;
+    if (wrap === true) flexWrap = 'wrap';
+    else if (typeof wrap === 'string') flexWrap = wrap;
+    else flexWrap = undefined;
+    const gap = typeof spacing === 'number' ? `${spacing}px` : spacing;
 
     const containerStyle: React.CSSProperties = {
-      display: "flex",
+      display: 'flex',
       flexDirection: direction,
       alignItems,
       justifyContent,
@@ -67,7 +70,7 @@ const Stack = React.forwardRef<HTMLElement, StackProps>(
     const count = validChildren.length;
 
     const renderChild = (child: React.ReactElement<React.HTMLAttributes<HTMLElement>>, index: number) => {
-      if (childrenRenderMode === "clone") {
+      if (childrenRenderMode === 'clone') {
         return React.cloneElement(child, {
           key: index,
           style: { ...child.props.style },
@@ -88,6 +91,7 @@ const Stack = React.forwardRef<HTMLElement, StackProps>(
     return (
       <Component ref={ref} className={className} style={containerStyle} {...rest}>
         {validChildren.map((child, index) => (
+          // eslint-disable-next-line react/no-array-index-key
           <React.Fragment key={index}>
             {renderChild(child, index)}
             {divider && index < count - 1 ? divider : null}
@@ -95,10 +99,10 @@ const Stack = React.forwardRef<HTMLElement, StackProps>(
         ))}
       </Component>
     );
-  }
+  },
 ) as StackComponent;
 
 Stack.Item = StackItem;
-Stack.displayName = "Stack";
+Stack.displayName = 'Stack';
 
 export default Stack;

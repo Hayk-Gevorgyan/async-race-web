@@ -1,17 +1,19 @@
-import React from "react";
+import React from 'react';
 
 export interface StackItemProps extends React.HTMLAttributes<HTMLElement> {
   as?: React.ElementType;
-  alignSelf?: "flex-start" | "flex-end" | "center" | "baseline" | "stretch";
-  flex?: React.CSSProperties["flex"];
-  grow?: React.CSSProperties["flexGrow"];
-  shrink?: React.CSSProperties["flexShrink"];
-  basis?: React.CSSProperties["flexBasis"];
-  order?: React.CSSProperties["order"];
+  alignSelf?: 'flex-start' | 'flex-end' | 'center' | 'baseline' | 'stretch';
+  flex?: React.CSSProperties['flex'];
+  grow?: React.CSSProperties['flexGrow'];
+  shrink?: React.CSSProperties['flexShrink'];
+  basis?: React.CSSProperties['flexBasis'];
+  order?: React.CSSProperties['order'];
 }
 
 const StackItem = React.forwardRef<HTMLElement, StackItemProps>(
-  ({ as: Component = "div", style, alignSelf, flex, grow, shrink, basis, order, ...rest }, ref) => {
+  ({
+    as: Component = 'div', style, alignSelf, flex, grow, shrink, basis, order, ...rest
+  }, ref) => {
     const itemStyle: React.CSSProperties = {
       alignSelf,
       order,
@@ -20,9 +22,9 @@ const StackItem = React.forwardRef<HTMLElement, StackItemProps>(
     };
 
     return <Component ref={ref} style={itemStyle} {...rest} />;
-  }
+  },
 );
 
-StackItem.displayName = "Stack.Item";
+StackItem.displayName = 'Stack.Item';
 
 export default StackItem;
