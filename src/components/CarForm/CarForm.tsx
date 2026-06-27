@@ -1,6 +1,8 @@
 import React, { FC, useState, useEffect } from "react";
 import { CarPayload } from "../../types/CarPayload";
 
+const NAME_MAX_LENGTH = 50;
+
 interface CarFormProps {
   mode: "create" | "edit";
   initialValues?: CarPayload;
@@ -24,9 +26,12 @@ export const CarForm: FC<CarFormProps> = React.memo(function CarForm({
     }
   }, [initialValues, mode]);
 
+  const isTooLong  = name.length > NAME_MAX_LENGTH;
+  const isInvalid  = !name.trim() || isTooLong;
+
   function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
-    if (!name.trim()) return;
+    if (isInvalid) return;
     onSubmit({ name: name.trim(), color });
     if (mode === "create") {
       setName("");
@@ -35,7 +40,7 @@ export const CarForm: FC<CarFormProps> = React.memo(function CarForm({
   }
 
   return (
-    <form onSubmit={handleSubmit} style={{ display: "flex", flexDirection: "column", gap: 6 }}>
+    <form onSubmit={handleSubmit} style={{ display: "flex", flexDirection: "column", gap: 4 }}>
       <div style={{ display: "flex", gap: 6, alignItems: "center" }}>
         <input
           type={"text"}
@@ -45,7 +50,7 @@ export const CarForm: FC<CarFormProps> = React.memo(function CarForm({
           disabled={disabled}
           style={{
             background: "#1e1e2e",
-            border: "1px solid #2a2a35",
+            border: `1px solid ${isTooLong ? "#f87171" : "#2a2a35"}`,
             borderRadius: 4,
             color: "#e0e0f0",
             padding: "4px 8px",
@@ -63,20 +68,25 @@ export const CarForm: FC<CarFormProps> = React.memo(function CarForm({
         />
         <button
           type={"submit"}
-          disabled={disabled || !name.trim()}
+          disabled={disabled || isInvalid}
           style={{
-            background: disabled ? "#2a2a35" : "#6c63ff",
-            color: disabled ? "#555" : "#fff",
+            background: disabled || isInvalid ? "#2a2a35" : "#6c63ff",
+            color: disabled || isInvalid ? "#555" : "#fff",
             border: "none",
             borderRadius: 4,
             padding: "4px 12px",
             fontSize: 13,
-            cursor: disabled ? "not-allowed" : "pointer",
+            cursor: disabled || isInvalid ? "not-allowed" : "pointer",
           }}
         >
           {mode === "create" ? "Add" : "Save"}
         </button>
       </div>
+      {isTooLong && (
+        <span style={{ fontSize: 11, color: "#f87171" }}>
+          Name too long ({name.length}/{NAME_MAX_LENGTH})
+        </span>
+      )}
     </form>
   );
 });

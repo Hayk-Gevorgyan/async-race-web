@@ -1,37 +1,24 @@
 import { Car as CarType } from "../../types/Car";
-import Stack from "../Stack";
 import React from "react";
 import { FC } from "react";
+import { Icon } from "../Icon";
 
-function invertColor(hex: string): string {
-  const clean = hex.replace("#", "").padStart(6, "0");
-  const r = 255 - parseInt(clean.slice(0, 2), 16);
-  const g = 255 - parseInt(clean.slice(2, 4), 16);
-  const b = 255 - parseInt(clean.slice(4, 6), 16);
-  return `#${[r, g, b].map((v) => v.toString(16).padStart(2, "0")).join("")}`;
-}
+export interface CarProps extends CarType {}
 
-export interface CarProps extends CarType {
-
-}
-
-export const Car: FC<CarProps> = React.memo(function Car({ name, color }: CarType) {
+export const Car: FC<CarProps> = React.memo(function Car({ color }: CarType) {
   return (
-    <Stack
-      justifyContent={"center"}
-      alignItems={"center"}
+    <div
       style={{
-        width: 160,
+        width: 70,
         height: 90,
-        backgroundColor: color,
-        color: invertColor(color),
-        fontSize: 12,
-        fontWeight: 600,
-        overflow: "hidden",
+        display: "flex",
+        alignItems: "center",
+        justifyContent: "center",
         userSelect: "none",
+        overflow: "hidden",
       }}
     >
-      {name}
-    </Stack>
+      <Icon name="car-top-view" size={90} color={color} />
+    </div>
   );
-})
+});

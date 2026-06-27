@@ -1,1 +1,1 @@
-export { GarageHeader, BRANDS, randomHex } from "./GarageHeader";
+export { GarageHeader, BRANDS, MODELS, randomFrom, randomHex } from "./GarageHeader";

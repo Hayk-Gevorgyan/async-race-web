@@ -1,11 +1,24 @@
-import React, { FC } from "react";
+import React, { FC, useEffect, useRef } from "react";
+import { Icon } from "../Icon";
+
+const AUTO_DISMISS_MS = 5000;
 
 interface WinnerBannerProps {
   winner: { name: string; time: number } | null;
   onClose: () => void;
+  resetKey: number;
 }
 
-export const WinnerBanner: FC<WinnerBannerProps> = React.memo(function WinnerBanner({ winner, onClose }) {
+export const WinnerBanner: FC<WinnerBannerProps> = React.memo(function WinnerBanner({ winner, onClose, resetKey }) {
+  const onCloseRef = useRef(onClose);
+  useEffect(() => { onCloseRef.current = onClose; }, [onClose]);
+
+  useEffect(() => {
+    if (!winner) return;
+    const timer = setTimeout(() => onCloseRef.current(), AUTO_DISMISS_MS);
+    return () => clearTimeout(timer);
+  }, [winner, resetKey]);
+
   if (!winner) return null;
 
   return (
@@ -28,6 +41,7 @@ export const WinnerBanner: FC<WinnerBannerProps> = React.memo(function WinnerBan
         boxShadow: "0 4px 24px rgba(0,0,0,0.4)",
       }}
     >
+      <Icon name="trophy" size={20} />
       <span>Winner: {winner.name} — {winner.time.toFixed(2)}s</span>
       <button
         onClick={onClose}
@@ -36,12 +50,13 @@ export const WinnerBanner: FC<WinnerBannerProps> = React.memo(function WinnerBan
           border: "none",
           color: "#fff",
           borderRadius: 4,
-          padding: "4px 10px",
+          padding: "4px 8px",
           cursor: "pointer",
-          fontSize: 13,
+          display: "flex",
+          alignItems: "center",
         }}
       >
-        ✕
+        <Icon name="cancel" size={14} />
       </button>
     </div>
   );

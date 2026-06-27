@@ -1,6 +1,7 @@
 import React, { FC, useState, useEffect } from "react";
 import { CarProps }                        from "../Car";
 import { Car }                             from "../Car";
+import { Icon }                            from "../Icon";
 
 const CAR_WIDTH    = 160;
 const CAR_HEIGHT   = 90;
@@ -33,6 +34,10 @@ const panelBtnStyle: React.CSSProperties = {
   fontSize: 12,
   cursor: "pointer",
   width: "100%",
+  display: "flex",
+  alignItems: "center",
+  justifyContent: "center",
+  gap: 5,
 };
 
 export const Track: FC<TrackProps> = React.memo(function Track({
@@ -63,12 +68,11 @@ export const Track: FC<TrackProps> = React.memo(function Track({
     }
   }, [raceState.status, raceState.transitionDuration, raceState.progress]);
 
-  const isActive  = raceState.status === "starting" || raceState.status === "racing";
-  const isBroken  = raceState.status === "broken";
+  const isActive = raceState.status === "starting" || raceState.status === "racing";
+  const isBroken = raceState.status === "broken";
 
   return (
     <div style={{ display: "flex", width: "100%", height: TRACK_HEIGHT, borderBottom: "2px solid #2a2a35" }}>
-      {/* Left control panel */}
       <div
         style={{
           width: PANEL_WIDTH,
@@ -84,23 +88,48 @@ export const Track: FC<TrackProps> = React.memo(function Track({
       >
         {isActive ? (
           <button style={{ ...panelBtnStyle, color: "#fbbf24" }} onClick={() => onStop(car.id)}>
-            Stop
+            <Icon name="cancel" size={11} color="#fbbf24" /> Stop
           </button>
         ) : (
           <button style={panelBtnStyle} onClick={() => onStart(car)}>
-            Start
+            <Icon name="flag" size={11} /> Start
           </button>
         )}
-        <button style={{ ...panelBtnStyle, color: "#a78bfa" }} onClick={() => onEdit(car)}>
-          Edit
+        <button
+          style={{ ...panelBtnStyle, color: isActive ? "#555" : "#a78bfa", cursor: isActive ? "not-allowed" : "pointer" }}
+          onClick={() => onEdit(car)}
+          disabled={isActive}
+        >
+          <Icon name="pencil" size={11} color={isActive ? "#555" : "#a78bfa"} /> Edit
         </button>
-        <button style={{ ...panelBtnStyle, color: "#f87171" }} onClick={() => onDelete(car.id)}>
-          Delete
+        <button
+          style={{ ...panelBtnStyle, color: isActive ? "#555" : "#f87171", cursor: isActive ? "not-allowed" : "pointer" }}
+          onClick={() => onDelete(car.id)}
+          disabled={isActive}
+        >
+          <Icon name="trash" size={11} color={isActive ? "#555" : "#f87171"} /> Delete
         </button>
       </div>
 
-      {/* Track section */}
-      <div style={{ position: "relative", flex: 1, backgroundColor: "#16161e", opacity: isBroken ? 0.5 : 1 }}>
+      <div style={{ position: "relative", flex: 1, backgroundColor: "#16161e" }}>
+        <div
+          style={{
+            position: "absolute",
+            left: 8,
+            top: "50%",
+            transform: "translateY(-50%)",
+            zIndex: 0,
+            fontSize: 18,
+            fontWeight: 700,
+            color: "#e8e8e8",
+            whiteSpace: "nowrap",
+            pointerEvents: "none",
+            userSelect: "none",
+          }}
+        >
+          {car.name}
+        </div>
+
         <div
           style={{
             position: "absolute",
@@ -110,10 +139,33 @@ export const Track: FC<TrackProps> = React.memo(function Track({
             transition: displayTransition > 0 ? `left ${displayTransition}ms linear` : "none",
             width: CAR_WIDTH,
             height: CAR_HEIGHT,
+            zIndex: 1,
+            opacity: isBroken ? 0.4 : 1,
           }}
         >
           <Car {...car} />
         </div>
+
+        {/* Broken indicator — follows car's last position */}
+        {isBroken && (
+          <div
+            style={{
+              position: "absolute",
+              top: "50%",
+              transform: "translateY(-50%)",
+              left: `calc(${displayProgress} * (100% - ${CAR_WIDTH}px))`,
+              width: CAR_WIDTH,
+              height: CAR_HEIGHT,
+              zIndex: 2,
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              pointerEvents: "none",
+            }}
+          >
+            <Icon name="wrench" size={36} color="#f87171" />
+          </div>
+        )}
       </div>
     </div>
   );

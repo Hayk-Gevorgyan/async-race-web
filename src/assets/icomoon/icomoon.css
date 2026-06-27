@@ -1,0 +1,51 @@
+@font-face {
+  font-family: 'icomoon';
+  src:  url('fonts/icomoon.eot?d92k2v');
+  src:  url('fonts/icomoon.eot?d92k2v#iefix') format('embedded-opentype'),
+    url('fonts/icomoon.ttf?d92k2v') format('truetype'),
+    url('fonts/icomoon.woff?d92k2v') format('woff'),
+    url('fonts/icomoon.svg?d92k2v#icomoon') format('svg');
+  font-weight: normal;
+  font-style: normal;
+  font-display: block;
+}
+
+[class^="icon-"], [class*=" icon-"] {
+  /* use !important to prevent issues with browser extensions that change fonts */
+  font-family: 'icomoon' !important;
+  speak: never;
+  font-style: normal;
+  font-weight: normal;
+  font-variant: normal;
+  text-transform: none;
+  line-height: 1;
+
+  /* Better Font Rendering =========== */
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+.icon-car-top-view:before {
+  content: "\e900";
+}
+.icon-pencil:before {
+  content: "\e905";
+}
+.icon-wrench:before {
+  content: "\e991";
+}
+.icon-trophy:before {
+  content: "\e99e";
+}
+.icon-trash:before {
+  content: "\e9ad";
+}
+.icon-flag:before {
+  content: "\e9cc";
+}
+.icon-add:before {
+  content: "\ea0a";
+}
+.icon-cancel:before {
+  content: "\ea0f";
+}

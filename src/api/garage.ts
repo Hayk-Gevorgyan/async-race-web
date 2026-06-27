@@ -30,6 +30,11 @@ export async function updateCar(id: number, payload: CarPayload): Promise<Car> {
   return res.json();
 }
 
+export async function getCar(id: number): Promise<Car> {
+  const res = await fetch(`${BASE_URL}/garage/${id}`);
+  return res.json();
+}
+
 export async function deleteCar(id: number): Promise<void> {
   await fetch(`${BASE_URL}/garage/${id}`, { method: "DELETE" });
 }
