@@ -14,6 +14,7 @@ export interface CarRaceState {
 interface TrackProps {
   car: CarProps;
   raceState: CarRaceState;
+  isRacing: boolean;
   onEdit: (car: CarProps) => void;
   onDelete: (id: number) => void;
   onStart: (car: CarProps) => void;
@@ -38,6 +39,7 @@ const panelBtnStyle: React.CSSProperties = {
 export const Track: FC<TrackProps> = React.memo(({
   car,
   raceState,
+  isRacing,
   onEdit,
   onDelete,
   onStart,
@@ -64,6 +66,7 @@ export const Track: FC<TrackProps> = React.memo(({
   }, [raceState.status, raceState.transitionDuration, raceState.progress]);
 
   const isActive = raceState.status === 'starting' || raceState.status === 'racing';
+  const editDeleteDisabled = isActive || isRacing;
   const isBroken = raceState.status === 'broken';
 
   return (
@@ -99,21 +102,21 @@ export const Track: FC<TrackProps> = React.memo(({
         )}
         <button
           type="button"
-          style={{ ...panelBtnStyle, color: isActive ? COLOR.TEXT_DISABLED : COLOR.INFO, cursor: isActive ? 'not-allowed' : 'pointer' }}
+          style={{ ...panelBtnStyle, color: editDeleteDisabled ? COLOR.TEXT_DISABLED : COLOR.INFO, cursor: editDeleteDisabled ? 'not-allowed' : 'pointer' }}
           onClick={() => onEdit(car)}
-          disabled={isActive}
+          disabled={editDeleteDisabled}
         >
-          <Icon name="pencil" size={11} color={isActive ? COLOR.TEXT_DISABLED : COLOR.INFO} />
+          <Icon name="pencil" size={11} color={editDeleteDisabled ? COLOR.TEXT_DISABLED : COLOR.INFO} />
           {' '}
           Edit
         </button>
         <button
           type="button"
-          style={{ ...panelBtnStyle, color: isActive ? COLOR.TEXT_DISABLED : COLOR.DANGER, cursor: isActive ? 'not-allowed' : 'pointer' }}
+          style={{ ...panelBtnStyle, color: editDeleteDisabled ? COLOR.TEXT_DISABLED : COLOR.DANGER, cursor: editDeleteDisabled ? 'not-allowed' : 'pointer' }}
           onClick={() => onDelete(car.id)}
-          disabled={isActive}
+          disabled={editDeleteDisabled}
         >
-          <Icon name="trash" size={11} color={isActive ? COLOR.TEXT_DISABLED : COLOR.DANGER} />
+          <Icon name="trash" size={11} color={editDeleteDisabled ? COLOR.TEXT_DISABLED : COLOR.DANGER} />
           {' '}
           Delete
         </button>

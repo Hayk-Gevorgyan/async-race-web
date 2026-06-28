@@ -69,6 +69,7 @@ export const GarageView: FC = React.memo(() => {
             key={car.id}
             car={car}
             raceState={raceStates[car.id] ?? DEFAULT_RACE_STATE}
+            isRacing={isRacing}
             onEdit={selectCar}
             onDelete={handleDelete}
             onStart={startCar}
@@ -81,6 +82,7 @@ export const GarageView: FC = React.memo(() => {
         currentPage={currentPage}
         totalPages={totalPages}
         onPageChange={setCurrentPage}
+        disabled={isRacing}
       />
     </Stack>
   );
