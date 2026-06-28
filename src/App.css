@@ -77,3 +77,17 @@ body {
   flex: 1;
   padding: 24px 0;
 }
+
+@media (max-width: 600px) {
+  .garage-header {
+    flex-direction: column !important;
+    align-items: stretch !important;
+    justify-content: flex-start !important;
+    gap: 12px !important;
+  }
+
+  .garage-header__race-btns {
+    flex-direction: row !important;
+    align-items: center !important;
+  }
+}

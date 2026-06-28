@@ -64,9 +64,10 @@ export const GarageHeader: FC<GarageHeaderProps> = React.memo(({
       direction="row"
       justifyContent="space-around"
       alignItems="center"
+      className="garage-header"
       style={{ padding: '12px 16px', borderBottom: `2px solid ${COLOR.BORDER}`, background: COLOR.BG_BASE }}
     >
-      <Stack direction="column" alignItems="stretch" spacing={6}>
+      <Stack direction="column" alignItems="stretch" spacing={6} className="garage-header__race-btns">
         <button
           type="button"
           onClick={onStartRace}

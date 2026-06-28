@@ -266,6 +266,9 @@ export const RaceProvider: FC<{ children: React.ReactNode }> = ({ children }) =>
     raceId.current += 1;
     bestVisualFinishAt.current = Infinity;
     bestWinner.current = null;
+    cars.forEach((car) => {
+      raceTimings.current[car.id] = { accumulatedMs: 0, segmentStartMs: 0 };
+    });
     cars.forEach((car) => startCar(car));
   }
 
