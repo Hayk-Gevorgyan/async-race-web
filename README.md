@@ -1,73 +1,62 @@
-# React + TypeScript + Vite
+# Async Race
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+Single-page application for managing a garage of cars and running drag races.
 
-Currently, two official plugins are available:
+**Deployed:** https://async-race-web-51vh.vercel.app/
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+> The app connects to a local mock server at `http://127.0.0.1:3000`. To use the deployed version or run locally, start the [async-race-api](https://github.com/mikhama/async-race-api) server first.
 
-## React Compiler
+## Run locally
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
-
-## Expanding the ESLint configuration
-
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
-
-```js
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-
-      // Remove tseslint.configs.recommended and replace with this
-      tseslint.configs.recommendedTypeChecked,
-      // Alternatively, use this for stricter rules
-      tseslint.configs.strictTypeChecked,
-      // Optionally, add this for stylistic rules
-      tseslint.configs.stylisticTypeChecked,
-
-      // Other configs...
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+```bash
+npm install
+npm run dev
 ```
 
-You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
+## Implementation checklist
 
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
+### Basic Structure
+#### Two views: Garage and Winners, switchable via nav
+#### State preserved when switching between views
+#### Garage view: header with controls + paginated car list
+#### Winners view: sortable table with pagination
 
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-      // Enable lint rules for React
-      reactX.configs['recommended-typescript'],
-      // Enable lint rules for React DOM
-      reactDom.configs.recommended,
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
-```
+### Garage
+#### Create a car (name + color)
+#### Update a car (name + color)
+#### Delete a car (also removed from winners)
+#### Color picker with hex preview
+#### Generate 100 random cars
+#### Pagination — 7 cars per page
+
+### Race
+#### Start/stop individual cars
+#### Start Race — all cars race simultaneously
+#### Reset Race — all cars return to start
+#### Winner banner with name and time (auto-dismisses)
+#### Winner persisted to server (the best time updated if faster)
+#### Race condition fix — winner set exactly once per race
+
+### Winners
+#### Table: №, car icon, name, wins, best time
+#### Sort by wins (ASC/DESC)
+#### Sort by the best time (ASC/DESC)
+#### Pagination — 10 winners per page
+
+### Code quality
+#### TypeScript strict mode
+#### ESLint with Airbnb config — covers all formatting rules Prettier would add (quotes, semicolons, indent, line length), making a separate Prettier setup redundant and a potential source of rule conflicts
+#### CSS custom properties (design tokens)
+#### React Context for shared state
+
+## Estimated score
+
+| Category        | Max     | Est.    |
+|-----------------|---------|---------|
+| Basic Structure | 80      | 80      |
+| Garage          | 90      | 85      |
+| Winners         | 50      | 50      |
+| Race            | 170     | 150     |
+| Prettier/ESLint | 10      | 10      |
+| Code Quality    | 100     | ?       |
+| **Total**       | **500** | **375** |
